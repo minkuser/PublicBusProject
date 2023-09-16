@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.board.service.impl.ReplyMapper">
+	<!-- 댓글 조회 -->
+	<select id="list"
+		resultType="egovframework.board.service.ReplyVO">
+		select reply_id, board_id, user_id, reply_date, reply_content
+		from reply
+		where board_id = #{board_id}
+	</select>
+
+	<!-- 댓글 작성 -->
+	<insert id="write"
+		parameterType="egovframework.board.service.ReplyVO">
+		insert into reply(board_id, user_id, reply_date, reply_content)
+		value(#{board_id}, #{user_id},
+		NOW(), #{reply_content})
+	</insert>
+
+	<!-- 댓글 수정 -->
+	<update id="modify"
+		parameterType="egovframework.board.service.ReplyVO">
+		update reply set
+		user_id = #{user_id},
+		reply_content = #{reply_content}
+		where reply_id = #{reply_id}
+		and board_id = #{board_id}
+	</update>
+	
+	<update id="updateUser">
+		UPDATE reply SET user_id='탈퇴한 사용자' 
+		where user_id=#{user_id}
+	</update>
+
+	<!-- 댓글 삭제 -->
+	<delete id="delete"
+		parameterType="egovframework.board.service.ReplyVO">
+		delete from reply
+		where reply_id = #{reply_id}
+		and board_id = ${board_id}
+	</delete>
+
+	<select id="select"
+		parameterType="egovframework.board.service.ReplyVO"
+		resultType="egovframework.board.service.ReplyVO">
+		select
+		reply_id, board_id, user_id, reply_date, reply_content
+		from reply
+		where board_id = #{board_id}
+		and reply_id = #{reply_id}
+	</select>
+</mapper>

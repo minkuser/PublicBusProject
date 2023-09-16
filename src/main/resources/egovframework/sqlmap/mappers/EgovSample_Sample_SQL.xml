@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="egovframework.sqlmap.mappers.EgovSample_Sample_SQL">
+	<!-- mapper-config에서 등록한 객체 -->
+
+	<resultMap type="BikeReservePlace" id="BikeReservePlace">
+		<result property="reservePlaceId"
+			column="bike_reserve_place_id" />
+		<result property="reservePlaceName"
+			column="bike_reserve_place_name" />
+		<result property="reservePlaceAddr"
+			column="bike_reserve_place_addr" />
+	</resultMap>
+
+	<insert id="insertSample">
+		insert into test(id, name) values(
+		#{id},
+		#{name})
+	</insert>
+
+	<select id="selectBikePlace" resultMap="BikeReservePlace"> <!-- 대여소 리스트 -->
+		select * from bike_reserve_place
+	</select>
+
+	<select id="selectSearchBikePlace" resultMap="BikeReservePlace"> <!-- 검색한 대여소 리스트 -->
+		SELECT * FROM bike_reserve_place
+		WHERE bike_reserve_place_addr LIKE
+		CONCAT('%', #{reservePlaceName}, '%') OR
+		bike_reserve_place_name LIKE
+		CONCAT('%', #{reservePlaceName}, '%')
+	</select>
+
+	<select id="selectBikeCount" resultType="int"> <!-- 대여가능 자전거 수 -->
+		SELECT COUNT(*) AS count_available_reserve
+		FROM bike WHERE
+		bike_reserve_place_id = #{bikeReservePlaceId}
+		AND bike_status =
+		#{bikeStatus};
+	</select>
+
+	<select id="selectBikeId" resultType="int"> <!-- 대여할 자전거 번호 -->
+		select MIN(bike_id) from bike where bike_reserve_place_id =
+		#{bikeReservePlaceId} AND bike_status = #{bikeStatus};
+	</select>
+
+	<insert id="insertReservation"> <!-- 예약등록 -->
+
+		insert into reservation(user_id, bike_id, start_time, period)
+		values(#{userId},#{bikeId},#{startTime},#{period});
+
+	</insert>
+
+	<update id="changeStatus"> <!-- 자전거 예약 상태 변경 -->
+
+		update bike set bike_status = 0 where bike_id = #{bikeId};
+
+	</update>
+
+	<select id="findReservePlaceId" resultType="int"> <!-- 대여소 이름으로 대여소 아이디 찾기 -->
+		SELECT bike_reserve_place_id from bike_reserve_place where
+		bike_reserve_place_name=#{reservePlaceName};
+	</select>
+
+	<select id="findReservePlaceName" resultType="java.lang.String"> <!-- 대여소 아이디로 대여소 이름 찾기 -->
+		SELECT bike_reserve_place_name from bike_reserve_place where
+		bike_reserve_place_id=#{reservePlaceId};
+	</select>
+
+	<select id="findReservePlaceByBikeId" resultType="int"> <!-- 바이크 아이디로 대여소 아이디 찾기 -->
+		select bike_reserve_place_id from bike where bike_id=#{bikeId};
+	</select>
+
+	<update id="changeStatusTrue"> <!-- 자전거 예약 상태 변경 -->
+
+		update bike set bike_status = 1 where bike_id = #{bikeId};
+
+	</update>
+
+	<select id="selectBikeId2" resultType="int"> <!-- 세션 아이디로 예약한 바이크 아이디 출력 -->
+		select bike_id from reservation where user_id=#{user_id};
+	</select>
+
+	<update id="updateReservePlace"> <!-- 반납 시 바이크 대여소 변경 -->
+		update bike set bike_reserve_place_id=#{bikeReservePlaceId} where
+		bike_id=#{bikeId};
+	</update>
+
+	<delete id="deleteReserve">
+		delete from reservation where user_id=#{user_id};
+	</delete>
+
+	<select id="checkReservation" resultType="int"> <!-- 예약 내역 확인 -->
+
+		SELECT COUNT(*) AS user_count
+		FROM reservation
+		where user_id =
+		#{userId};
+	</select>
+	
+		
+	<update id="updateUser1">
+		UPDATE reservation SET user_id='탈퇴한 사용자' 
+		where user_id=#{user_id}
+	</update>
+
+</mapper>

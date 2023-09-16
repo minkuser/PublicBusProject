@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="egovframework.board.service.impl.QBoardMapper">
+	<resultMap type="qBoard" id="qBoardResult">
+		<id property="no" column="no" />
+		<result property="category" column="category" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="users" column="user_id" />
+		<result property="regDate" column="reg_date" />
+		<result property="readCount" column="read_cnt" />
+		<result property="fileName" column="fileName" />
+		<result property="groupId" column="group_id" />
+		<result property="groupOrder" column="group_order" />
+		<result property="layer" column="layer" />
+	</resultMap>
+
+
+	<insert id="insertQBoard">
+		<selectKey resultType="int" keyProperty="groupId"
+			order="BEFORE">
+			select ifnull(max(group_id),0)+1 from qboard
+		</selectKey>
+		insert into qboard(category,title,content,user_id,fileName,group_id)
+		values(#{category},#{title},#{content},#{users},#{fileName},#{groupId})
+	</insert>
+
+
+	<select id="selectQBoardList" resultMap="qBoardResult">
+		select
+		row_number() over(order by group_id,layer desc,group_order desc)
+		as rnum,q.*
+		from qboard q
+		<where>
+			<if test="typeCondition.equals('USER')">
+				category="USER"
+			</if>
+			<if test="typeCondition.equals('RENTAL')">
+				category="RENTAL"
+			</if>
+			<if test="typeCondition.equals('PLACE')">
+				category="PLACE"
+			</if>
+			<if test="typeCondition.equals('ETC')">
+				category="ETC"
+			</if>
+		</where>
+		order by group_id desc,layer,group_order
+		LIMIT #{recordCountPerPage}
+		OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectQBoard" resultMap="qBoardResult">
+		select * from qboard where
+		no=#{no}
+	</select>
+
+	<update id="updateQBoard">
+		update qboard set
+		category=#{category},title=#{title},content=#{content},fileName=#{fileName}
+		where no=#{no}
+	</update>
+
+	<delete id="deleteQBoard">
+		delete from qboard
+		where group_id=#{groupId}
+	</delete>
+
+	<delete id="deleteQReply">
+		delete from qboard
+		where no=#{no}
+	</delete>
+
+	<update id="updateReadCount">
+		update qboard set read_cnt=read_cnt+1
+		where no=#{no}
+	</update>
+
+	<insert id="insertQReply">
+		insert into
+		qboard(category,title,content,user_id,group_id,group_order,layer)
+		values(#{category},"RE:답글입니다.",#{content},#{users},#{groupId},#{groupOrder}+1,#{layer}+1)
+	</insert>
+	
+	<update id="updateUser">
+		UPDATE qboard SET user_id='탈퇴한 사용자'
+		where user_id=#{user_id}
+	</update>
+
+	<select id="maxLayer" resultType="Integer">
+		select max(layer) from qboard
+		where group_id=#{groupId}
+	</select>
+
+	<select id="selectQBoardTotal" resultType="Integer">
+		select count(*) from qboard
+		<where>
+			<if test="typeCondition.equals('USER')">
+				category="USER"
+			</if>
+			<if test="typeCondition.equals('RENTAL')">
+				category="RENTAL"
+			</if>
+			<if test="typeCondition.equals('PLACE')">
+				category="PLACE"
+			</if>
+			<if test="typeCondition.equals('ETC')">
+				category="ETC"
+			</if>
+		</where>
+	</select>
+
+</mapper>

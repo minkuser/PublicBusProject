@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<typeAliases>
+		<typeAlias alias="board"
+			type="egovframework.board.service.BoardVO" />
+		<typeAlias alias="reply"
+			type="egovframework.board.service.ReplyVO" />
+		<typeAlias alias="user"
+			type="egovframework.board.service.UserVO" />
+		<typeAlias alias="qBoard"
+			type="egovframework.board.service.QBoardVO" />
+<!-- 		<typeAlias alias="egovMap"
+			type="egovframework.rte.psl.dataaccess.util.EgovMap" /> -->
+		<typeAlias alias="BikeReservePlace"
+			type="egovframework.sample.vo.BikeReservePlaceVO" />
+		<typeAlias alias="Bike"
+			type="egovframework.sample.vo.BikeVO" />
+	</typeAliases>
+
+	<typeHandlers>
+		<typeHandler
+			handler="egovframework.board.service.QBoardCategoryTypeHandler" />
+	</typeHandlers>
+</configuration>
